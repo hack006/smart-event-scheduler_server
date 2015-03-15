@@ -1,18 +1,10 @@
 # smart-event-scheduler_server
 Server side of Ruby on Rails web event or meetups scheduling software. Just create new party and let the app make your hard organization work. Automatically select the best date and activity. Scheduling alghorithm is powered by GLPK ILP solver.
-This application was generated with the [rails_apps_composer](https://github.com/RailsApps/rails_apps_composer) gem
-provided by the [RailsApps Project](http://railsapps.github.io/).
-
-Rails Composer is open source and supported by subscribers. Please join RailsApps to support development of Rails Composer.
 
 Problems? Issues?
 -----------
 
-Need help? Ask on Stack Overflow with the tag 'railsapps.'
-
-Your application contains diagnostics in the README file. Please provide a copy of the README file when reporting any issues.
-
-If the application doesn't work as expected, please [report an issue](https://github.com/RailsApps/rails_apps_composer/issues)
+If the application doesn't work as expected, please [report an issue](https://github.com/hack006/smart-event-scheduler_server/issues)
 and include the diagnostics.
 
 Ruby on Rails
@@ -45,3 +37,4 @@ Credits
 
 License
 -------
+Licensed under MIT license.
