@@ -1,0 +1,42 @@
+<div>
+  <!-- TODO separate -->
+  <a ui-sref="myEvents()" class="btn btn-xs btn-default">
+    <i class="fa fa-arrow-left"></i>
+    My events
+  </a>
+</div>
+
+<h1>Event - {{ event.name }}
+  <small>{{ event.id }}</small>
+</h1>
+
+<form>
+
+  <div class="form-group">
+
+    <label class="form-label col-md-2">Description</label>
+
+    <div class="col-md-10">
+        <textarea class="form-control" ng-model="event.description">
+
+      </textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label col-md-2">Created at</label>
+    <div class="col-md-4">
+      <datetimepicker ng-model="event.created_at" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+    </div>
+
+    <label class="form-label col-md-2">Voting deadline</label>
+
+    <div class="col-md-4">
+      <datetimepicker ng-model="event.voting_deadline" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+    </div>
+  </div>
+
+</form>
+
+<h2>Event votings</h2>
+TODO

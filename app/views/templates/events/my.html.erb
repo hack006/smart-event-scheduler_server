@@ -1,0 +1,25 @@
+<div class="container">
+  <h2>My events</h2>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Voting deadline</th>
+      <td>Actions</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="event in events">
+      <td> <a ui-sref="eventDetail({id: event.id})" title="Click to view detail"> {{event.id}} </a></td>
+      <td> {{event.name}}</td>
+      <td> {{event.voting_deadline | date }} </td>
+      <td>
+        <a class="btn btn-xs btn-danger" ng-click="removeEvent(event)">Delete action</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150314230557) do
+ActiveRecord::Schema.define(version: 20150315092911) do
 
   create_table "activity_details", force: true do |t|
     t.integer  "event_id"
@@ -44,9 +44,11 @@ ActiveRecord::Schema.define(version: 20150314230557) do
     t.integer  "manager_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "slug"
   end
 
   add_index "events", ["manager_id"], name: "index_events_on_manager_id", using: :btree
+  add_index "events", ["slug"], name: "index_events_on_slug", unique: true, using: :btree
 
   create_table "participants", force: true do |t|
     t.text     "note"

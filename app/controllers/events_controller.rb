@@ -1,12 +1,16 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [:update, :destroy]
+  before_action :set_event, only: [:show, :update, :destroy]
 
   respond_to :json
 
   # /events/my
   def my_events
-    @events = Event.where(manager_id: current_user.id).all
-    respond_with(@events)
+    @my_events = Event.where(manager_id: current_user.id).all
+    respond_with(@my_events)
+  end
+
+  def show
+    respond_with(@event)
   end
 
   def create
@@ -27,10 +31,10 @@ class EventsController < ApplicationController
 
   private
   def set_event
-    @event = Event.find(params[:id])
+    @event = Event.friendly.find(params[:id])
   end
 
   def event_params
-    params.require(:event).permit(:name, :description, :voting_deadline)
+    params.require(:events).permit(:name, :description, :voting_deadline)
   end
 end
