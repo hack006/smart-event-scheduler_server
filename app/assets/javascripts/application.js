@@ -15,6 +15,7 @@
 //= require angular
 //= require bootstrap-sprockets
 // = require angular-resource
+// = require angular-animate
 //= require angular-ui-router
 //= require angular-ui-bootstrap
 //= require angular-ui-bootstrap-tpls

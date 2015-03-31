@@ -6,6 +6,10 @@ var app = angular.module('smartEventScheduler.common.rest', ['ngResource']);
 app.factory('restService', function ($resource, restProcessingRequestCount, flash) {
     return {
         createRestResource: function (url, defaultParams, actions) {
+            /* default params configuration */
+            defaultParams.limit = defaultParams.limit || 20;
+            defaultParams.page = defaultParams.limitCount || 1;
+
             var restResource = $resource(url, defaultParams, actions);
 
             var extendedRestService = {};

@@ -21,10 +21,19 @@ app.config(function ($stateProvider) {
 
 });
 
-app.controller('MyEventsController', function ($scope, eventResourceService, flash) {
+app.controller('MyEventsController', function ($scope, eventResourceService, flash, listLimitCount) {
     var Event = eventResourceService.getResource();
 
-    $scope.events = Event.getMyEvents();
+    $scope.events = [];
+
+    $scope.loadList = function (limit, limitCount) {
+        var limit = limit || listLimitCount;
+        var limitCount = limitCount || 1;
+
+        $scope.events = Event.getMyEvents({ limit: limit, limitCount: limitCount });
+    };
+
+    $scope.loadList();
 
     $scope.removeEvent = function (event) {
         var Event = eventResourceService.getResource();
@@ -33,7 +42,7 @@ app.controller('MyEventsController', function ($scope, eventResourceService, fla
             var eventIndex = $scope.events.indexOf(event);
 
             $scope.events.splice(eventIndex, 1);
-            flash.success = 'Successfully removed.'
+            flash.success = 'Successfully removed.'; // TODO animate deleted row
         });
     }
 });

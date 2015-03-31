@@ -18,7 +18,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="event in events">
+    <tr ng-repeat="event in events" class="list-item">
       <td> <a ui-sref="auth.eventDetail({id: event.id})" title="Click to view detail"> {{event.id}} </a></td>
       <td> {{event.name}}</td>
       <td> {{event.voting_deadline | date }} </td>
@@ -29,4 +29,5 @@
     </tbody>
   </table>
 
+  <load-more-button loading-function="loadList" limit="3" limit-count="1"></load-more-button>
 </div>

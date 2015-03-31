@@ -5,7 +5,10 @@ class EventsController < ApplicationController
 
   # /events/my
   def my_events
-    @my_events = Event.where(manager_id: current_user.id).all
+    limit = params[:limit].to_i || 100
+    limit_count = params[:limitCount].to_i || 1
+
+    @my_events = Event.where(manager_id: current_user.id).limit(limit*limit_count).all
     respond_with(@my_events)
   end
 

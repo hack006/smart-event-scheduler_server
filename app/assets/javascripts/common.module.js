@@ -1,4 +1,4 @@
-var app = angular.module('smartEventScheduler.common', ['smartEventScheduler.common.rest']);
+var app = angular.module('smartEventScheduler.common', ['ngAnimate', 'smartEventScheduler.common.rest']);
 
 /* common directives and services put HERE */
 app.value('apiVersion', 'api1');
@@ -29,3 +29,23 @@ app.directive('displayValidations', function ($compile) {
        }
    }
 });
+
+app.directive('loadMoreButton', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            loadingFunction: '&',
+            limit: '=',
+            limitCount: '='
+        },
+        template: '<a class="btn btn-primary" ng-click="loadMore()">Load more</a>',
+        link: function (scope, element, attrs) {
+            scope.loadMore = function () {
+                scope.limitCount = scope.limitCount + 1;
+                scope.loadingFunction()(scope.limit, scope.limitCount);
+            }
+        }
+    }
+});
+
+app.value('listLimitCount', 20);
