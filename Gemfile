@@ -16,6 +16,7 @@ gem 'angularjs-rails'
 gem 'angular-ui-router-rails', git: 'https://github.com/iven/angular-ui-router-rails.git'
 gem 'angular-ui-bootstrap-rails'
 gem 'angular-ui-sortable-rails'
+gem 'angular_rails_csrf'
 gem 'bootstrap-sass'
 gem "font-awesome-rails"
 group :development do

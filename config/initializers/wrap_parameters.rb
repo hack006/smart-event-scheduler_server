@@ -1,3 +1,4 @@
+require 'action_controller/params_normalizer'
 # Be sure to restart your server when you modify this file.
 
 # This file contains settings for ActionController::ParamsWrapper which
@@ -6,6 +7,7 @@
 # Enable parameter wrapping for JSON. You can disable this by setting :format to an empty array.
 ActiveSupport.on_load(:action_controller) do
   wrap_parameters format: [:json] if respond_to?(:wrap_parameters)
+  include ActionController::ParamsNormalizer
 end
 
 # To enable root element in JSON for ActiveRecord objects.

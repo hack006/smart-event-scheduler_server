@@ -4,7 +4,7 @@ class TimeDetailsController < ApplicationController
 
   respond_to :json
 
-  # /event/:event_id/times
+  # /api1/event/:event_id/times
   def event_times
     @times = TimeDetail.joins(:slots)
                         .joins(:events)

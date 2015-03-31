@@ -14,14 +14,17 @@ class EventsController < ApplicationController
   end
 
   def create
+    # TODO authorize
+
     @event = Event.new(event_params)
+    @event.manager_id = current_user.id
     @event.save
-    respond_with(@event)
+    respond_with @event, template: 'events/show'
   end
 
   def update
     @event.update(event_params)
-    respond_with(@event)
+    respond_with @event, template: 'events/show'
   end
 
   def destroy
@@ -35,6 +38,6 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:events).permit(:name, :description, :voting_deadline)
+    params.permit(:name, :description, :voting_deadline)
   end
 end

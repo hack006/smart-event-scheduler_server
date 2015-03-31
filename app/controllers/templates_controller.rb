@@ -1,7 +1,7 @@
 class TemplatesController < ApplicationController
 
   def index
-    render 'index', layout: 'application'
+    render :index, layout: 'application'
   end
 
   # GET /template/:entity/:template

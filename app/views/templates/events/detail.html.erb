@@ -1,6 +1,6 @@
 <div>
   <!-- TODO separate -->
-  <a ui-sref="myEvents()" class="btn btn-xs btn-default">
+  <a ui-sref="auth.myEvents" class="btn btn-xs btn-default">
     <i class="fa fa-arrow-left"></i>
     My events
   </a>
@@ -10,7 +10,17 @@
   <small>{{ event.id }}</small>
 </h1>
 
-<form>
+<form name="form" class="form-horizontal" ng-submit="form.$valid && save()">
+  <div class="form-group">
+
+    <label class="form-label col-md-2">Name</label>
+
+    <div class="col-md-10">
+      <input type="text" minlength="3" maxlength="100" required class="form-control"
+             ng-model="event.name"
+             form="form" name="name" display-validations>
+    </div>
+  </div>
 
   <div class="form-group">
 
@@ -24,19 +34,92 @@
   </div>
 
   <div class="form-group">
-    <label class="form-label col-md-2">Created at</label>
-    <div class="col-md-4">
-      <datetimepicker ng-model="event.created_at" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+    <div ng-if="event.createdAt">
+        <label class="form-label col-md-2">Created at</label>
+
+        <div class="col-md-4">
+          <datetimepicker ng-model="event.createdAt" date-format="yyyy-MM-dd" readonly-time="true"></datetimepicker>
+        </div>
     </div>
 
     <label class="form-label col-md-2">Voting deadline</label>
 
     <div class="col-md-4">
-      <datetimepicker ng-model="event.voting_deadline" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+      <datetimepicker ng-model="event.votingDeadline" date-format="yyyy-MM-dd" readonly-time="false"></datetimepicker>
     </div>
   </div>
 
-</form>
+  <h2>Event times</h2>
+  <div ng-repeat="time in event.times">
+    <div class="form-group">
+      <label class="form-label col-md-2">From</label>
 
-<h2>Event votings</h2>
-TODO
+      <div class="col-md-4">
+        <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+      </div>
+
+      <label class="form-label col-md-2">Until</label>
+
+      <div class="col-md-4">
+        <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-2">
+      <a class="btn btn-success btn-block" ng-click="addTime()">
+        <i class="fa fa-plus"></i>
+        Add time
+      </a>
+    </div>
+  </div>
+
+  <h2>Event places / activities</h2>
+
+  <div ng-repeat="activity in event.activities">
+    <div class="form-group">
+      <label class="form-label col-md-1">Name</label>
+
+      <div class="col-md-2">
+        <input type="text" class="form-control"
+               ng-model="activity.name"
+               name="name" form="form" display-validations required>
+      </div>
+
+      <label class="form-label col-md-1">Price</label>
+      <div class="col-md-2">
+       <input type="number" min="0" class="form-control"
+              ng-model="activity.price"
+              name="price" form="form" display-validations>
+      </div>
+
+      <label class="form-label col-md-1">Per</label>
+      <div class="col-md-2">
+        <input ng-model="activity.pricePerUnit">
+      </div>
+
+      <div class="col-md-2">
+        <a class="btn btn-danger" ng-click="event.activities.remove(activity)">Remove</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-2">
+      <a class="btn btn-success btn-block" ng-click="addActivity()">
+        <i class="fa fa-plus"></i>
+        Add activity
+      </a>
+    </div>
+  </div>
+
+  <h2>Event votings</h2>
+  TODO
+
+  <div class="row">
+    <div class="col-md-2 col-md-offset-10">
+      <button type="submit" class="btn btn-success btn-block">Save</button>
+    </div>
+  </div>
+</form>

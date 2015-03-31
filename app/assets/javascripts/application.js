@@ -19,4 +19,5 @@
 //= require angular-ui-bootstrap
 //= require angular-ui-bootstrap-tpls
 //= require datetimepicker
+//= require angular-flash
 //= require_tree .

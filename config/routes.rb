@@ -7,13 +7,14 @@ Rails.application.routes.draw do
       collection do
         get 'my' => 'events#my_events'
       end
+
+      resources :activity_details
+
+      resources :time_details
+
+      resources :slots
+
     end
-
-    resources :activity_details
-
-    resources :time_details
-
-    resources :slots
 
     resources :availabilities
 
