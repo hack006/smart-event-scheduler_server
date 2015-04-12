@@ -33,89 +33,139 @@
     </div>
   </div>
 
-  <div class="form-group">
-    <div ng-if="event.createdAt">
-        <label class="form-label col-md-2">Created at</label>
+  <div class="form-group vertical-align">
+    <label class="form-label col-md-1" ng-if="event.createdAt">Created at</label>
 
-        <div class="col-md-4">
-          <datetimepicker ng-model="event.createdAt" date-format="yyyy-MM-dd" readonly-time="true"></datetimepicker>
-        </div>
+    <div class="col-md-4 disabled" ng-if="event.createdAt">
+      {{ event.createdAt | date }}
     </div>
 
     <label class="form-label col-md-2">Voting deadline</label>
 
-    <div class="col-md-4">
+    <div class="col-md-5">
       <datetimepicker ng-model="event.votingDeadline" date-format="yyyy-MM-dd" readonly-time="false"></datetimepicker>
+      {{ event.votingDeadline | remainingTime }}
     </div>
   </div>
 
-  <h2>Event times</h2>
-  <div ng-repeat="time in event.times">
-    <div class="form-group">
-      <label class="form-label col-md-2">From</label>
+  <tabset>
+    <!--  EVENT VOTING TAB  -->
+    <tab>
+      <tab-heading>
+        <i class="fa fa-table"></i>
+        Event votings
+      </tab-heading>
+      <h2>Event votings</h2>
+      TODO
 
-      <div class="col-md-4">
-        <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+    </tab>
+
+    <!--  EVENT TIMES TAB  -->
+    <tab>
+      <tab-heading>
+        <i class="fa fa-clock-o"></i>
+        Event times
+      </tab-heading>
+      <h2>Event times</h2>
+      <div class="form-group">
+        <label class="col-md-3">Default time slot length in minutes</label>
+        <div class="col-md-2 form-label">
+          <input type="number" class="form-control"
+                 ng-model="defaultTimeSlotInMinutes"
+                 form="form" name="defaultTimeSlotInMinutes" required min="0" display-validations>
+        </div>
+      </div>
+      <div ng-repeat="time in event.times" class="list-item">
+        <div ng-form="timeForm" ng-controller="EventTimeController">
+            <div class="form-group vertical-align">
+              <label class="form-label col-md-1">From</label>
+
+              <div class="col-md-4">
+                <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"
+                                form="timeForm" name="from"></datetimepicker>
+              </div>
+
+              <label class="form-label col-md-1">Until</label>
+
+              <div class="col-md-4">
+                <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"
+                                form="timeForm" name="until"></datetimepicker>
+              </div>
+
+              <label class="col-md-1">Duration</label>
+              <div class="col-md-1">
+                {{ dateDifferenceInMinutes(time.until, time.from) }}&nbsp;min
+              </div>
+
+              <div class="col-md-1">
+                <div class="btn btn-danger btn-block" role="button" ng-click="removeTime(time)">
+                  <i class="fa fa-times"></i>
+                </div>
+              </div>
+            </div>
+        </div>
       </div>
 
-      <label class="form-label col-md-2">Until</label>
-
-      <div class="col-md-4">
-        <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"></datetimepicker>
+      <div class="row">
+        <div class="col-md-2">
+          <a class="btn btn-success btn-block" ng-click="addTime()">
+            <i class="fa fa-plus"></i>
+            Add time
+          </a>
+        </div>
       </div>
-    </div>
-  </div>
+    </tab>
 
-  <div class="row">
-    <div class="col-md-2">
-      <a class="btn btn-success btn-block" ng-click="addTime()">
-        <i class="fa fa-plus"></i>
-        Add time
-      </a>
-    </div>
-  </div>
+    <!--  EVENT ACTIVITIES TAB  -->
+    <tab>
+      <tab-heading>
+        <i class="fa fa-lightbulb-o"></i>
+        Event activities / places
+      </tab-heading>
+      <h2>Event activities / places</h2>
 
-  <h2>Event places / activities</h2>
+      <div ng-repeat="activity in event.activities" ng-form="activityForm">
+        <div class="form-group">
+          <label class="form-label col-md-1">Name</label>
 
-  <div ng-repeat="activity in event.activities">
-    <div class="form-group">
-      <label class="form-label col-md-1">Name</label>
+          <div class="col-md-4">
+            <input type="text" class="form-control"
+                   ng-model="activity.name"
+                   name="name" form="activityForm" display-validations required>
+          </div>
 
-      <div class="col-md-2">
-        <input type="text" class="form-control"
-               ng-model="activity.name"
-               name="name" form="form" display-validations required>
+          <label class="form-label col-md-1">Price</label>
+          <div class="col-md-2">
+            <input type="number" min="0" class="form-control"
+                   ng-model="activity.price"
+                   name="price" form="activityForm" display-validations>
+          </div>
+
+          <label class="form-label col-md-1">Per</label>
+          <div class="col-md-2">
+            <input type="text" class="form-control"
+                   ng-model="activity.pricePerUnit"
+                   name="pricePerUnit" form="activityForm">
+          </div>
+
+          <div class="col-md-1">
+            <a class="btn btn-danger" ng-click="event.activities.remove(activity)">
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+        </div>
       </div>
 
-      <label class="form-label col-md-1">Price</label>
-      <div class="col-md-2">
-       <input type="number" min="0" class="form-control"
-              ng-model="activity.price"
-              name="price" form="form" display-validations>
+      <div class="row">
+        <div class="col-md-2">
+          <a class="btn btn-success btn-block" ng-click="addActivity()">
+            <i class="fa fa-plus"></i>
+            Add activity
+          </a>
+        </div>
       </div>
-
-      <label class="form-label col-md-1">Per</label>
-      <div class="col-md-2">
-        <input ng-model="activity.pricePerUnit">
-      </div>
-
-      <div class="col-md-2">
-        <a class="btn btn-danger" ng-click="event.activities.remove(activity)">Remove</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-2">
-      <a class="btn btn-success btn-block" ng-click="addActivity()">
-        <i class="fa fa-plus"></i>
-        Add activity
-      </a>
-    </div>
-  </div>
-
-  <h2>Event votings</h2>
-  TODO
+    </tab>
+  </tabset>
 
   <div class="row">
     <div class="col-md-2 col-md-offset-10">

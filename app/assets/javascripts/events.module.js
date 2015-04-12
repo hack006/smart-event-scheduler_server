@@ -21,58 +21,118 @@ app.config(function ($stateProvider) {
 
 });
 
-app.controller('MyEventsController', function ($scope, eventResourceService, flash, listLimitCount) {
+app.factory('EVENT_TIMES', function () {
+    return {
+        CURRENT: 'CURRENT',
+        PAST: 'PAST'
+    }
+});
+
+app.controller('MyEventsController', function ($scope, eventResourceService, flash, listLimitCount, EVENT_TIMES) {
     var Event = eventResourceService.getResource();
 
     $scope.events = [];
+    $scope.limit = listLimitCount;
+    $scope.limitCount = 1;
+    $scope.timeOfEvents = EVENT_TIMES.CURRENT;
+    $scope.EVENT_TIMES = EVENT_TIMES;
 
-    $scope.loadList = function (limit, limitCount) {
-        var limit = limit || listLimitCount;
-        var limitCount = limitCount || 1;
-
-        $scope.events = Event.getMyEvents({ limit: limit, limitCount: limitCount });
+    $scope.loadList = function () {
+        $scope.events = Event.getMyEvents({
+            limit: $scope.limit,
+            limitCount: $scope.limitCount,
+            timeOfEvents: $scope.timeOfEvents
+        }, function (data) {
+            angular.forEach(data, function (event) {
+                event.votingDeadline = new Date(event.votingDeadline);
+            });
+        });
     };
 
-    $scope.loadList();
-
     $scope.removeEvent = function (event) {
-        var Event = eventResourceService.getResource();
-
         Event.delete(event, function (data) {
             var eventIndex = $scope.events.indexOf(event);
 
             $scope.events.splice(eventIndex, 1);
             flash.success = 'Successfully removed.'; // TODO animate deleted row
         });
-    }
+    };
+
+    $scope.setEventTimeFilter = function (eventsTime) {
+        $scope.timeOfEvents = eventsTime;
+        $scope.loadList();
+    };
 });
 
 app.controller('EventController', function ($scope, $state, $stateParams, eventResourceService) {
     var Event = eventResourceService.getResource();
 
     if (angular.isDefined($stateParams.id)) {
-        $scope.event = Event.get({id: $stateParams.id});
+        $scope.event = Event.get({id: $stateParams.id}, function (data) {
+            angular.forEach(data.times, function (time) {
+                time.from = new Date(time.from);
+                time.until = new Date(time.until);
+            })
+        });
     } else {
         $scope.event = {
+            votingDeadline: getCurrentDate().cloneAddSeconds(DAY_IN_SECONDS * 7),
             times: [],
             activities: []
         };
     }
 
+    $scope.defaultTimeSlotInMinutes = 60;
+
     $scope.addTime = function () {
-        $scope.event.times.push({});
+        $scope.event.times.push({
+            from: getCurrentDate(),
+            until: getCurrentDate()
+        });
+    };
+
+    $scope.removeTime = function (time) {
+        var eventIndex = $scope.event.times.indexOf(time);
+        $scope.event.times.splice(eventIndex, 1);
     };
 
     $scope.addActivity = function () {
         $scope.event.activities.push({});
     };
 
+    $scope.removeActivity = function (activity) {
+        var eventIndex = $scope.event.activities.indexOf(activity);
+        $scope.event.activities.splice(eventIndex, 1);
+    };
+
 
     $scope.save = function () {
         Event.save($scope.event, function (data) {
             console.log('success event save callback');
-            $state.go('auth.eventDetail', { id: data.id })
+            $state.go('auth.eventDetail', {id: data.id})
         });
+    };
+});
+
+app.controller('EventTimeController', function ($scope) {
+    // fill until with the from + default slot length value
+
+    var dateToMinutes = function (date) {
+        return date.getTime() / 60000;
+    };
+
+    $scope.$watch('time.from.getTime()', function () {
+        if (angular.isDefined($scope.time.from) && $scope.timeForm.until.$pristine) {
+            $scope.time.until = $scope.time.from.cloneAddSeconds(60 * $scope.defaultTimeSlotInMinutes);
+        }
+    });
+
+    $scope.dateDifferenceInMinutes = function (date1, date2) {
+        if (angular.isUndefined(date1) || angular.isUndefined(date2)) {
+            return 0
+        } else {
+            return dateToMinutes(new Date(date1.getTime() - date2.getTime()))
+        }
     };
 });
 

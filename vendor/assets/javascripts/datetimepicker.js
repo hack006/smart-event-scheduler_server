@@ -83,8 +83,8 @@ angular.module('ui.bootstrap.datetimepicker',
           function createAttrConcat(previousAttrs, attr) {
             return previousAttrs + createAttr.apply(null, attr)
           }
-          var tmpl = "<div class=\"datetimepicker-wrapper\">" +
-            "<input class=\"form-control\" type=\"text\" ng-click=\"open($event)\" is-open=\"opened\" ng-model=\"ngModel\" " + [
+          var tmpl = "<div class=\"datetimepicker-wrapper\" ng-form=\"dateTimePickerForm\">" +
+            "<input class=\"form-control\" form=\"dateTimePickerForm\" name=\"date\" type=\"text\" ng-click=\"open($event)\" is-open=\"opened\" ng-model=\"ngModel\" " + [
               ["minDate"],
               ["maxDate"],
               ["dayFormat"],
@@ -102,7 +102,7 @@ angular.module('ui.bootstrap.datetimepicker',
             createEvalAttr("placeholder", "placeholder") +
             "/>\n" +
             "</div>\n" +
-            "<div class=\"datetimepicker-wrapper\" ng-model=\"time\" ng-change=\"time_change()\" style=\"display:inline-block\">\n" +
+            "<div class=\"datetimepicker-wrapper\" form=\"dateTimePickerForm\" name=\"time\" ng-model=\"time\" ng-change=\"time_change()\" style=\"display:inline-block\">\n" +
             "<timepicker " + [
               ["hourStep"],
               ["minuteStep"],
@@ -123,7 +123,7 @@ angular.module('ui.bootstrap.datetimepicker',
                 if (typeof $scope.ngModel == "string") $scope.ngModel = new Date($scope.ngModel);
                 $scope.ngModel.setHours($scope.time.getHours(), $scope.time.getMinutes());
               }
-            }
+            };
             $scope.open = function($event) {
               $event.preventDefault();
               $event.stopPropagation();

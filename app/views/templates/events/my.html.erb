@@ -1,10 +1,26 @@
 <div class="container">
-  <h2>My events</h2>
+  <h2>
+    My events
+    <small ng-if="timeOfEvents == EVENT_TIMES.PAST">in the past</small>
+    <small ng-if="timeOfEvents == EVENT_TIMES.CURRENT">in the future</small>
+  </h2>
     <div class="row">
       <div class="col-md-2">
         <a class="btn btn-success btn-block" ui-sref="auth.newEvent">
           <i class="fa fa-plus"></i>
           Create new event
+        </a>
+      </div>
+      <div class="col-md-2" ng-if="timeOfEvents == EVENT_TIMES.CURRENT">
+        <a class="btn btn-default btn-block" ng-click="setEventTimeFilter(EVENT_TIMES.PAST)">
+          <i class="fa fa-history"></i>
+          Show past events
+        </a>
+      </div>
+
+      <div class="col-md-2" ng-if="timeOfEvents == EVENT_TIMES.PAST">
+        <a class="btn btn-default btn-block" ng-click="setEventTimeFilter(EVENT_TIMES.CURRENT)">
+          Show current events
         </a>
       </div>
     </div>
@@ -21,7 +37,12 @@
     <tr ng-repeat="event in events" class="list-item">
       <td> <a ui-sref="auth.eventDetail({id: event.id})" title="Click to view detail"> {{event.id}} </a></td>
       <td> {{event.name}}</td>
-      <td> {{event.voting_deadline | date }} </td>
+      <td>
+        {{event.votingDeadline | date }}
+        <span class="label label-default">
+          {{ event.votingDeadline | remainingTime }}
+        </span>
+      </td>
       <td>
         <a class="btn btn-xs btn-danger" ng-click="removeEvent(event)">Delete action</a>
       </td>
@@ -29,5 +50,5 @@
     </tbody>
   </table>
 
-  <load-more-button loading-function="loadList" limit="3" limit-count="1"></load-more-button>
+  <load-more-button loading-function="loadList" limit="limit" limit-count="limitCount"></load-more-button>
 </div>
