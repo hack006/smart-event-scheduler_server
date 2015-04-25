@@ -19,8 +19,13 @@ gem 'angular-ui-sortable-rails'
 gem 'angular_rails_csrf'
 gem 'bootstrap-sass'
 gem "font-awesome-rails"
+
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_21]
   gem 'rails_layout'
+end
+
+group :test, :development do
+  gem 'rspec-rails'
 end

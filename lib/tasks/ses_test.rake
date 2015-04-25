@@ -1,5 +1,5 @@
 namespace :ses do
-  task :test_data  => :environment do
+  task :test_data do
     raise 'Error, can be only run under TEST environment' if Rails.env != 'test'
     Rake::Task['db:drop'].invoke
     Rake::Task['db:create'].invoke
