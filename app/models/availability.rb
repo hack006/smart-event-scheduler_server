@@ -1,10 +1,9 @@
 class Availability < ActiveRecord::Base
-  AVAILABILITY_TYPES = %w(can cant) # TODO extend in the future
 
   belongs_to :slot
   belongs_to :participant
 
-  validates :status, inclusion: {in: AVAILABILITY_TYPES},
+  validates :status, inclusion: {in: AvailabilityStatuses::to_string_a},
             presence: true
   validates_uniqueness_of :participant_id, scope: :slot_id
 end

@@ -49,16 +49,6 @@
   </div>
 
   <tabset>
-    <!--  EVENT VOTING TAB  -->
-    <tab>
-      <tab-heading>
-        <i class="fa fa-table"></i>
-        Event votings
-      </tab-heading>
-      <h2>Event votings</h2>
-      TODO
-
-    </tab>
 
     <!--  EVENT TIMES TAB  -->
     <tab>
@@ -67,8 +57,10 @@
         Event times
       </tab-heading>
       <h2>Event times</h2>
+
       <div class="form-group">
         <label class="col-md-3">Default time slot length in minutes</label>
+
         <div class="col-md-2 form-label">
           <input type="number" class="form-control"
                  ng-model="defaultTimeSlotInMinutes"
@@ -77,32 +69,33 @@
       </div>
       <div ng-repeat="time in event.times" class="list-item">
         <div ng-form="timeForm" ng-controller="EventTimeController">
-            <div class="form-group vertical-align">
-              <label class="form-label col-md-1">From</label>
+          <div class="form-group vertical-align">
+            <label class="form-label col-md-1">From</label>
 
-              <div class="col-md-4">
-                <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"
-                                form="timeForm" name="from"></datetimepicker>
-              </div>
+            <div class="col-md-4">
+              <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"
+                              form="timeForm" name="from"></datetimepicker>
+            </div>
 
-              <label class="form-label col-md-1">Until</label>
+            <label class="form-label col-md-1">Until</label>
 
-              <div class="col-md-4">
-                <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"
-                                form="timeForm" name="until"></datetimepicker>
-              </div>
+            <div class="col-md-4">
+              <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"
+                              form="timeForm" name="until"></datetimepicker>
+            </div>
 
-              <label class="col-md-1">Duration</label>
-              <div class="col-md-1">
-                {{ dateDifferenceInMinutes(time.until, time.from) }}&nbsp;min
-              </div>
+            <label class="col-md-1">Duration</label>
 
-              <div class="col-md-1">
-                <div class="btn btn-danger btn-block" role="button" ng-click="removeTime(time)">
-                  <i class="fa fa-times"></i>
-                </div>
+            <div class="col-md-1">
+              {{ dateDifferenceInMinutes(time.until, time.from) }}&nbsp;min
+            </div>
+
+            <div class="col-md-1">
+              <div class="btn btn-danger btn-block" role="button" ng-click="removeTime(time)">
+                <i class="fa fa-times"></i>
               </div>
             </div>
+          </div>
         </div>
       </div>
 
@@ -135,6 +128,7 @@
           </div>
 
           <label class="form-label col-md-1">Price</label>
+
           <div class="col-md-2">
             <input type="number" min="0" class="form-control"
                    ng-model="activity.price"
@@ -142,6 +136,7 @@
           </div>
 
           <label class="form-label col-md-1">Per</label>
+
           <div class="col-md-2">
             <input type="text" class="form-control"
                    ng-model="activity.pricePerUnit"
@@ -164,6 +159,37 @@
           </a>
         </div>
       </div>
+    </tab>
+
+    <!--  EVENT VOTING TAB  -->
+    <tab>
+      <tab-heading>
+        <i class="fa fa-table"></i>
+        Event slots
+      </tab-heading>
+      <h2>Event slots</h2>
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Date</th>
+          <th colspan="{{event.activities.length}}">Activities</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="time in event.times">
+          <th>
+            {{ time.from | date:'short' }} - {{ time.until | date:'short' }}
+          </th>
+          <td ng-repeat="activity in event.activities" class="box">
+            {{ activity.name }}
+            <a class="btn btn-default" ng-click="toggleSlot(time, activity)">
+              {{ isSelected(time, activity) }}
+              Select
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </tab>
   </tabset>
 

@@ -17,3 +17,5 @@ json.activities @event.activities do |activity|
   json.price activity.price
   json.pricePerUnit activity.price_per_unit
 end
+
+json.slots Hash.new

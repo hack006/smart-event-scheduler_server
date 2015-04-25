@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :preference_prioritizations
+
   root :to => "templates#index"
   get '/templates/:entity/:template' => 'templates#template'
 
@@ -18,7 +20,7 @@ Rails.application.routes.draw do
 
     resources :availabilities
 
-    resources :preferences
+    resources :preference_conditions
 
     resources :participants
 

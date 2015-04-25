@@ -1,0 +1,8 @@
+json.id @preference_condition.id,
+json.conditionType @preference_condition.condition_type
+json.participationOwnerId @preference_condition.participant_id
+json.participant1Id @preference_condition.participant1_id
+json.participant2Id @preference_condition.participant2_id
+
+json.createdAt @preference_condition.created_at
+json.updatedAt @preference_condition.updated_at

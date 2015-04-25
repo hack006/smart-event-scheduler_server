@@ -78,7 +78,8 @@ app.controller('EventController', function ($scope, $state, $stateParams, eventR
         $scope.event = {
             votingDeadline: getCurrentDate().cloneAddSeconds(DAY_IN_SECONDS * 7),
             times: [],
-            activities: []
+            activities: [],
+            slots: {} // {<time_detail_id>: [<activity_ids>]}
         };
     }
 
@@ -105,6 +106,27 @@ app.controller('EventController', function ($scope, $state, $stateParams, eventR
         $scope.event.activities.splice(eventIndex, 1);
     };
 
+    $scope.toggleSlot = function (time, activity) {
+        var slots = $scope.event.slots;
+        if (angular.isUndefined(slots[time.id])) {
+            slots[time.id] = [];
+        }
+        var indexOfActivity = slots[time.id].indexOf(activity.id);
+        if (indexOfActivity == -1) {
+            slots[time.id].push(activity.id);
+        } else {
+            slots.splice(indexOfActivity, 1);
+        }
+    };
+
+    $scope.isSelected = function (time, activity) {
+        var slots = $scope.event.slots;
+        if (angular.isUndefined(slots[time.id])) {
+            return false;
+        } else {
+            return slots[time.id].contains(activity.id);
+        }
+    };
 
     $scope.save = function () {
         Event.save($scope.event, function (data) {

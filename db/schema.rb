@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150315092911) do
+ActiveRecord::Schema.define(version: 20150425153756) do
 
   create_table "activity_details", force: true do |t|
     t.integer  "event_id"
@@ -55,32 +55,48 @@ ActiveRecord::Schema.define(version: 20150315092911) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "event_id"
   end
 
+  add_index "participants", ["event_id"], name: "index_participants_on_event_id", using: :btree
   add_index "participants", ["user_id"], name: "index_participants_on_user_id", using: :btree
 
-  create_table "preferences", force: true do |t|
-    t.string   "type"
+  create_table "preference_conditions", force: true do |t|
+    t.string   "condition_type"
     t.integer  "participant_id"
-    t.integer  "user1_id"
-    t.integer  "user2_id"
+    t.integer  "participant1_id"
+    t.integer  "participant2_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "preference_conditions", ["participant1_id"], name: "index_preference_conditions_on_participant1_id", using: :btree
+  add_index "preference_conditions", ["participant2_id"], name: "index_preference_conditions_on_participant2_id", using: :btree
+  add_index "preference_conditions", ["participant_id"], name: "index_preference_conditions_on_participant_id", using: :btree
+
+  create_table "preference_prioritizations", force: true do |t|
+    t.integer  "participant_id"
+    t.integer  "for_participant_id"
     t.integer  "multiplier"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "preferences", ["participant_id"], name: "index_preferences_on_participant_id", using: :btree
-  add_index "preferences", ["user1_id"], name: "index_preferences_on_user1_id", using: :btree
-  add_index "preferences", ["user2_id"], name: "index_preferences_on_user2_id", using: :btree
+  add_index "preference_prioritizations", ["for_participant_id"], name: "index_preference_prioritizations_on_for_participant_id", using: :btree
+  add_index "preference_prioritizations", ["participant_id"], name: "index_preference_prioritizations_on_participant_id", using: :btree
 
   create_table "slots", force: true do |t|
     t.integer  "event_id"
     t.string   "note"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "time_detail_id"
+    t.integer  "activity_detail_id"
   end
 
+  add_index "slots", ["activity_detail_id"], name: "index_slots_on_activity_detail_id", using: :btree
   add_index "slots", ["event_id"], name: "index_slots_on_event_id", using: :btree
+  add_index "slots", ["time_detail_id"], name: "index_slots_on_time_detail_id", using: :btree
 
   create_table "time_details", force: true do |t|
     t.integer  "event_id"
