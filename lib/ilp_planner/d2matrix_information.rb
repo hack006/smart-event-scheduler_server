@@ -1,3 +1,5 @@
+require_relative 'index_range'
+
 # Stores information about matrix used to solve meeting problem
 #
 # @attr_reader [Integer] :m number of rows

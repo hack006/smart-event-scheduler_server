@@ -12,9 +12,10 @@ module IlpPlanner
 
       event_slot_count = event.slots.count
       event_participant_count = event.participants.count
-      event_condition_count = PreferenceCondition.where('participant_id IN (?)', event.participants.map { |p| p.id}).count
+      event_participant_ids = self.get_participant_ids(event.id)
+      event_condition_count = PreferenceCondition.where('participant_id IN (?)', event_participant_ids).count
 
-      column_size = event_slot_count * event_participant_count
+      column_size = event_slot_count * event_participant_count + 1
       row_size = event_slot_count * (1 + event_condition_count)
 
       event_slot_ids_asc = event.slots
@@ -32,13 +33,35 @@ module IlpPlanner
       D2MatrixInformation.new(row_size, column_size, slot_index_ranges, event_slot_ids_asc)
     end
 
-    private
-      def self.calculate_column_size(event)
+    # Calculates participant wish ratings (how they are valuable for others to participate)
+    #
+    # Value is based
+    # @TODO calculation is based on all preference_priorizations, maybe some better heuristic could be found
+    #
+    # @param [Integer] event_id
+    # @return [Hash] wish ratings for each participant, [Integer] key - participant_id, [Integer] value - wish ranking
+    def self.calc_participant_wish_ratings(event_id)
+      participant_wish_rankings = {}
 
+      self.get_participant_ids(event_id).each do |participant_id|
+        participant_wish_rankings[participant_id] = 0
+
+        PreferencePrioritization
+            .where(:for_participant_id => participant_id)
+            .each{ |preference_priority| participant_wish_rankings[participant_id] += preference_priority.multiplier }
       end
 
-      def self.calculate_row_size
+      return participant_wish_rankings
+    end
 
-      end
+    def self.get_participant_ids(event_id)
+      participant_ids = []
+      Event.find(event_id).participants
+          .select('id')
+          .each { |participant| participant_ids << participant.id }
+
+      return participant_ids
+    end
+
   end
 end
