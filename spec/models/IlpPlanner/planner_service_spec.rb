@@ -15,7 +15,7 @@ module IlpPlanner
 
       event = Event.first
       assert_equal 1, event.id
-      matrix = IlpPlanner::PlannerService.calc_matrix_information_for_event(event)
+      matrix = IlpPlanner::PlannerService.calc_matrix_information_for_slot(event)
 
       expect(matrix.m).to equal(16) # 4 slots, 3 conditions -> 4 + 3 * 4
       expect(matrix.n).to equal(16)

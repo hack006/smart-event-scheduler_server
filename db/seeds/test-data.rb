@@ -54,10 +54,10 @@ sarah_participant = Participant.create!({user: sarah, event: event})
 #                              (should win)
 
 [
-    {user: john_participant, availabilities: ['y', '', 'y', 'n', 'n']},
-    {user: jamie_participant, availabilities: ['y', '', 'y', 'n', 'n']},
-    {user: peter_participant, availabilities: ['y', '', 'y', 'n', 'n']},
-    {user: sarah_participant, availabilities: ['y', '', 'y', 'n', 'n']}
+    {user: john_participant, availabilities:  ['n', 'y', 'y', 'n']},
+    {user: jamie_participant, availabilities: ['n', 'n', 'y', 'n']},
+    {user: peter_participant, availabilities: ['n', 'y', 'y', 'n']},
+    {user: sarah_participant, availabilities: ['n', 'y', 'y', 'y']}
 ].each do |entry|
     [time_slot_1_beer, time_slot_2_beer, time_slot_2_sport, time_slot_3_sport].each_with_index do |slot, index|
         availability_status = AvailabilityStatuses::AVAILABLE if entry[:availabilities][index] == 'y'

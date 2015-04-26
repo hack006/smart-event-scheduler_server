@@ -17,16 +17,31 @@ module IlpPlanner
       @a_matrix = []
       @a_matrix_rows = []
       @a_matrix_columns = []
+      @criterial_function_coefficients = []
       @b_vector = []
     end
 
-    def plan (event_id)
-      setup_new_calculation_for(event_id)
+    def self.plan (event_id)
+      event = Event.find(event_id)
+      results = []
+
+      event.slots.each_with_index do |slot, index|
+        slot_planner = IlpPlanner::Planner.new
+        slot_planner.plan_slot(slot)
+        # TODO store results and get the best one
+        results << slot_planner.solve_plan_slot_get_result
+      end
+
+      results
+    end
+
+    def plan_slot(slot)
+      setup_new_calculation_for(slot)
       build_ilp_structures
       create_rglpk_problem
     end
 
-    def get_results
+    def solve_plan_slot_get_result
       puts 'Running simplex calculation ...'
       @glpk.simplex
       puts 'Calculation ended'
@@ -34,22 +49,25 @@ module IlpPlanner
       z = @glpk.obj.get
 
       results = [z]
-      @glpk_rows.each do |row|
-        results << row.get_prim
+      @glpk_cols.each do |col|
+        results << col.get_prim
       end
 
       results
     end
 
     private
-      def setup_new_calculation_for(event_id)
-        @event = Event.find(event_id)
 
-        @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@event)
+      def setup_new_calculation_for(slot)
+        @event = slot.event
+        @slot = slot
+
+        @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_slot(@slot)
 
         # init structures - A, b
-        (0..@matrix_information.m-1).each{|row_index| @a_matrix[row_index] = Array.new(@matrix_information.n, 0) }
+        (0..@matrix_information.m-1).each { |row_index| @a_matrix[row_index] = Array.new(@matrix_information.n, 0) }
         @b_vector = Array.new(@matrix_information.m, 0)
+        @criterial_function_coefficients = Array.new(@matrix_information.n, 0)
 
         create_a_matrix_columns
       end
@@ -60,43 +78,36 @@ module IlpPlanner
 
         participant_ids = IlpPlanner::PlannerService.get_participant_ids(@event.id)
 
-        # fill each slot
-        @event.slots.each_with_index do |slot, slot_index|
-          slot_range = @matrix_information.slot_ranges[slot.id]
+        # criterial function coefficients
 
-          slot_availabilities_by_participant_id = {}
-          participant_ids.each do |participant_id|
-            slot_availabilities_by_participant_id[participant_id] = AvailabilityStatuses::DEFAULT
+        slot_availability_by_participant_id = {}
+        participant_ids.each do |participant_id|
+          slot_availability_by_participant_id[participant_id] = AvailabilityStatuses::DEFAULT
+        end
+
+        @slot.availabilities.each do |availability|
+          slot_availability_by_participant_id[availability.participant_id] = availability.status
+        end
+
+        participant_ids.each_with_index do |participant_id, index|
+          if slot_availability_by_participant_id[participant_id] == AvailabilityStatuses::AVAILABLE
+            @criterial_function_coefficients[index] = @participant_wish_ratings[participant_id]
           end
+        end
 
-          slot.availabilities.each do |availability|
-            slot_availabilities_by_participant_id[availability.participant_id] = availability.status
-          end
+        PreferenceCondition.where('participant_id IN (?)', participant_ids).each_with_index do |condition, index|
+          # TODO A matrix
+          #@a_matrix[index][some_row] = ?
 
-          (slot_range.start..slot_range.stop).each_with_index do |column_index, index|
-            slot_participant_id = participant_ids[index]
-
-            if slot_availabilities_by_participant_id[slot_participant_id] == AvailabilityStatuses::AVAILABLE
-              ci = @participant_wish_ratings[slot_participant_id]
-              @a_matrix[slot_index][column_index] = ci
-            else
-              # already set 0 by default
-            end
-
-          end
-
-          # last column holding MIN used to find maximum
-          @a_matrix[slot_index][@matrix_information.n-1] = -1
-
-          @b_vector[slot_index] = 0
-          @a_matrix_rows[slot_index] = IlpMatrixRow.new("slot[#{slot.id}]", Rglpk::GLP_UP, 0, 0)
+          @b_vector[index] = 0
+          @a_matrix_rows[index] = IlpMatrixRow.new("condition[\##{@slot.id}]", Rglpk::GLP_UP, 0, 9999)
         end
       end
 
       def create_rglpk_problem
         @glpk = Rglpk::Problem.new
-        @glpk.name = "Scheduling best event date for [event:\##{@event.id}]"
-        @glpk.obj.dir = Rglpk::GLP_MIN
+        @glpk.name = "Scheduling best person combination for slot\##{@slot.id} for event\##{@event.id}]"
+        @glpk.obj.dir = Rglpk::GLP_MAX
 
         # rows
         @glpk_rows = @glpk.add_rows(@matrix_information.m)
@@ -108,14 +119,14 @@ module IlpPlanner
         # columns
         @glpk_cols = @glpk.add_cols(@matrix_information.n)
         @a_matrix_columns.each_with_index do |column, index|
-          @glpk_cols[index].name  = column.name
+          @glpk_cols[index].name = column.name
           @glpk_cols[index].set_bounds(column.bound_type, column.lower_bound, column.upper_bound)
           @glpk_cols[index].kind = column.variable_type
         end
 
         # c(j) values
-        criterial_function_coeficients = Array.new(@matrix_information.n - 1, 0) + [1]
-        @glpk.obj.coefs = criterial_function_coeficients
+        # todo
+        @glpk.obj.coefs = @criterial_function_coefficients
 
         # A(i,j)
         @glpk.set_matrix(@a_matrix.flatten)
@@ -125,15 +136,9 @@ module IlpPlanner
       def create_a_matrix_columns
         participant_ids = IlpPlanner::PlannerService.get_participant_ids(@event.id)
 
-        @matrix_information.slot_ids_asc.each do |slot_id|
-          slot_range = @matrix_information.slot_ranges[slot_id]
-
-          (slot_range.start..slot_range.stop).each_with_index do |slot_column_index, index|
-              @a_matrix_columns[slot_column_index] = IlpMatrixColumn.new("s#{slot_id}p#{participant_ids[index]}", Rglpk::GLP_LO, 0, 0, Rglpk::GLP_BV)
-          end
+        participant_ids.each_with_index do |participant_id, index|
+          @a_matrix_columns[index] = IlpMatrixColumn.new("p#{participant_id}", Rglpk::GLP_LO, 0, 0, Rglpk::GLP_BV)
         end
-
-        @a_matrix_columns[@matrix_information.n-1] = IlpMatrixColumn.new('MIN', Rglpk::GLP_LO, 0, 0, Rglpk::GLP_CV)
       end
   end
 end

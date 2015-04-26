@@ -12,10 +12,7 @@ module IlpPlanner
     it 'should correctly create ILP problem' do
       event = Event.first
 
-      ilp_planner = IlpPlanner::Planner.new
-      ilp_planner.plan(event.id)
-
-      puts ilp_planner.get_results.to_s
+      puts IlpPlanner::Planner.plan(event.id).to_s
     end
   end
 
