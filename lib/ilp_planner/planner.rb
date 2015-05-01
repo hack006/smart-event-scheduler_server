@@ -1,7 +1,3 @@
-require_relative 'planner_service'
-require_relative 'ilp_matrix_column'
-require_relative 'ilp_matrix_row'
-
 module IlpPlanner
   class Planner
 
@@ -27,9 +23,9 @@ module IlpPlanner
 
       event.slots.each_with_index do |slot, index|
         slot_planner = IlpPlanner::Planner.new
-        slot_planner.plan_slot(slot)
+
         # TODO store results and get the best one
-        results << slot_planner.solve_plan_slot_get_result
+        results << slot_planner.plan_slot(slot)
       end
 
       results
@@ -39,30 +35,32 @@ module IlpPlanner
       setup_new_calculation_for(slot)
       build_ilp_structures
       create_rglpk_problem
-    end
 
-    def solve_plan_slot_get_result
-      puts 'Running simplex calculation ...'
-      @glpk.simplex
-      puts 'Calculation ended'
-
-      z = @glpk.obj.get
-
-      results = [z]
-      @glpk_cols.each do |col|
-        results << col.get_prim
-      end
-
-      results
+      solve_plan_slot_get_result
     end
 
     private
+
+      def solve_plan_slot_get_result
+        puts 'Running simplex calculation ...'
+        @glpk.simplex
+        puts 'Calculation ended'
+
+        z = @glpk.obj.get
+
+        results = [z]
+        @glpk_cols.each do |col|
+          results << col.get_prim
+        end
+
+        results
+      end
 
       def setup_new_calculation_for(slot)
         @event = slot.event
         @slot = slot
 
-        @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_slot(@slot)
+        @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@event)
 
         # init structures - A, b
         (0..@matrix_information.m-1).each { |row_index| @a_matrix[row_index] = Array.new(@matrix_information.n, 0) }

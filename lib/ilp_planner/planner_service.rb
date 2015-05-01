@@ -1,16 +1,10 @@
-require 'ilp_planner/index_range'
-require 'ilp_planner/d2matrix_information'
-
 module IlpPlanner
   class PlannerService
     # Get the dimensions of A matrix used to calculate best date match using ILP
     #
     # @param [Event] event
     # @return [D2MatrixInformation]
-    def self.calc_matrix_information_for_slot(slot)
-      slot_index_ranges = {}
-      event = slot.event
-
+    def self.calc_matrix_information_for_event(event)
       event_participant_count = event.participants.count
       event_participant_ids = self.get_participant_ids(event.id)
       event_condition_count = PreferenceCondition.where('participant_id IN (?)', event_participant_ids).count
@@ -18,12 +12,7 @@ module IlpPlanner
       column_size = event_participant_count
       row_size = event_condition_count
 
-      event_slot_ids_asc = event.slots
-                               .select('id')
-                               .order(id: :asc)
-                               .map { |slot| slot.id}
-
-      D2MatrixInformation.new(row_size, column_size, event_slot_ids_asc)
+      D2MatrixInformation.new(row_size, column_size)
     end
 
     # Calculates participant wish ratings (how they are valuable for others to participate)
@@ -54,6 +43,10 @@ module IlpPlanner
           .each { |participant| participant_ids << participant.id }
 
       return participant_ids
+    end
+
+    def self.get_event_participant_id(event_id, participant_id)
+      self.get_participant_ids(event_id).index(participant_id)
     end
 
   end
