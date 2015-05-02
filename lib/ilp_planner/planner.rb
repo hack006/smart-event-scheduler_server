@@ -24,6 +24,8 @@ module IlpPlanner
         slot_planner = IlpPlanner::Planner.new
 
         # TODO store results and get the best one
+        # TODO reduce calculation of all variants if any better could not be found
+
         results << slot_planner.plan_slot(slot)
       end
 
@@ -87,8 +89,17 @@ module IlpPlanner
       participant_ids = IlpPlanner::PlannerService.get_participant_ids(@event.id)
       unavailable_participant_ids = []
 
-      # criterial function coefficients
+      build_ilp_criterial_function_coefficients(participant_ids, unavailable_participant_ids)
 
+      build_ilp_preference_conditions(participant_ids)
+
+      build_ilp_unavailability_constrains(unavailable_participant_ids)
+
+      build_ilp_count_constrains
+
+    end
+
+    def build_ilp_criterial_function_coefficients(participant_ids, unavailable_participant_ids)
       slot_availability_by_participant_id = {}
       participant_ids.each do |participant_id|
         slot_availability_by_participant_id[participant_id] = AvailabilityStatuses::DEFAULT
@@ -105,9 +116,9 @@ module IlpPlanner
           unavailable_participant_ids << participant_id
         end
       end
+    end
 
-      # participant preference conditions
-
+    def build_ilp_preference_conditions(participant_ids)
       preference_condition_creator = IlpPlanner::PreferenceConditionCreator.new(@slot)
 
       PreferenceCondition.where('participant_id IN (?)', participant_ids).each_with_index do |condition, index|
@@ -161,9 +172,9 @@ module IlpPlanner
         end
 
       end
+    end
 
-      # Unavailable participant conditions
-
+    def build_ilp_unavailability_constrains(unavailable_participant_ids)
       @matrix_information.unavailability_conditions_range.each_index do |position, position_index|
         participant_id = unavailable_participant_ids[position_index]
         event_participant_id = IlpPlanner::PlannerService.get_event_participant_id(@event.id, participant_id)
@@ -171,7 +182,9 @@ module IlpPlanner
         @a_matrix[position][event_participant_id] = 1
         @a_matrix_rows[position] = IlpMatrixRow.new("condition_participant_unavailable[\##{event_participant_id}]", Rglpk::GLP_FX , 0, 0)
       end
+    end
 
+    def build_ilp_count_constrains
       # Participant count limits
       if @matrix_information.required_count_conditions_range.length != 0
         row_index = @matrix_information.required_count_conditions_range.start_index
@@ -192,7 +205,6 @@ module IlpPlanner
           @a_matrix_rows[row_index] = IlpMatrixRow.new("paritipant_count[LEQ(#{maximum_participant_count})]", Rglpk::GLP_UP , 0, maximum_participant_count)
         end
       end
-
     end
 
     def create_rglpk_problem
