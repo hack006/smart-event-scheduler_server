@@ -28,10 +28,10 @@ module IlpPlanner
       build_ilp_structures
       create_rglpk_problem
 
-      solve_plan_slot_get_result
-
       # TODO remove in production
       write_debug_files
+
+      solve_plan_slot_get_result
     end
 
     private
@@ -45,6 +45,7 @@ module IlpPlanner
       @glpk.write_lp(file_path + filename)
     end
 
+    # @return [IlpPlanner::EventPlanningResult]
     def solve_plan_slot_get_result
       puts 'Running simplex calculation ...'
       @glpk.simplex
@@ -52,12 +53,11 @@ module IlpPlanner
 
       z = @glpk.obj.get
 
-      results = [z]
-      @glpk_cols.each do |col|
-        results << col.get_prim
+      variable_values = @glpk_cols.map do |col|
+        col.get_prim
       end
 
-      results
+      IlpPlanner::EventPlanningResult.new(@slot, z, variable_values)
     end
 
     def setup_new_calculation

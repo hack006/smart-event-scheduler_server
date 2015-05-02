@@ -13,12 +13,13 @@ module IlpPlanner
       event = Event.first
 
       event_planner_operator = IlpPlanner::PlannerOperator.new(event.id)
-      results =  event_planner_operator.find_best_slot.to_s
+      result =  event_planner_operator.find_best_slot
 
-      puts results
+      puts "Criterial value: #{result.criterial_value}\n"
+      puts "Variable values: #{result.variable_values}\n"
 
-      expect(results).to be_a_kind_of String
-      expect(results.length).to be > 0
+      expect(result.criterial_value).to be_a_kind_of Numeric
+      expect(result.criterial_value).to eq 33
     end
   end
 
