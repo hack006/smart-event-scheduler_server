@@ -21,9 +21,8 @@ time_slot_2 = TimeDetail.create!({event: event, from: (day2 + hour14), until: (d
 time_slot_3 = TimeDetail.create!({event: event, from: (day2 + hour18), until: (day2 + hour19)})
 
 # Activities
-# TODO minimal person required
-activity_beer = ActivityDetail.create!({event: event, name: 'Go to the pub', price: 100, price_per_unit: 'hour'})
-activity_sport = ActivityDetail.create!({event: event, name: 'Play volleyball', price: 150, price_per_unit: 'hour'})
+activity_beer = ActivityDetail.create!({event: event, name: 'Go to the pub', price: 100, price_per_unit: 'hour', maximum_count: 4})
+activity_sport = ActivityDetail.create!({event: event, name: 'Play volleyball', price: 150, price_per_unit: 'hour', minimum_count: 2, maximum_count: 3})
 
 # Slots
 time_slot_1_beer = Slot.create!({event: event, time_detail: time_slot_1, activity_detail: activity_beer})

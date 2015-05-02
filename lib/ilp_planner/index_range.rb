@@ -20,4 +20,11 @@ class IndexRange
       block.call i, i - @start_index
     end
   end
+
+  # Get length of the interval
+  #
+  # @return [Integer] length
+  def length
+    return [0, 1 + @end_index - @start_index].max
+  end
 end

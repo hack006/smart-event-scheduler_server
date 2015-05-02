@@ -150,11 +150,11 @@ module IlpPlanner
         case condition_row.equality_operator
           when IlpPlanner::EqualityTypes::LESS_OR_EQUAL_THAN then
             rglpk_equality = Rglpk::GLP_UP
-            @a_matrix_rows[index] = IlpMatrixRow.new("condition[\##{condition.id}]", rglpk_equality, 0, condition_row.right_side_value) # TODO
+            @a_matrix_rows[index] = IlpMatrixRow.new("condition[\##{condition.id}]", rglpk_equality, 0, condition_row.right_side_value)
 
           when IlpPlanner::EqualityTypes::GREATER_OR_EQUAL_THAN then
             rglpk_equality = Rglpk::GLP_LO
-            @a_matrix_rows[index] = IlpMatrixRow.new("condition[\##{condition.id}]", rglpk_equality, condition_row.right_side_value, 0) # TODO
+            @a_matrix_rows[index] = IlpMatrixRow.new("condition[\##{condition.id}]", rglpk_equality, condition_row.right_side_value, 0)
 
           else
             raise 'Equality not implemented error'
@@ -172,10 +172,25 @@ module IlpPlanner
         @a_matrix_rows[position] = IlpMatrixRow.new("condition_participant_unavailable[\##{event_participant_id}]", Rglpk::GLP_FX , 0, 0)
       end
 
-      # Unavailable participant conditions
-      @matrix_information.required_count_conditions_range.each_index do |position, position_index|
-        raise 'Not implemented error'
-        # TODO
+      # Participant count limits
+      if @matrix_information.required_count_conditions_range.length != 0
+        row_index = @matrix_information.required_count_conditions_range.start_index
+
+        if @slot.activity_detail.minimum_count.present?
+          minimum_participant_count = @slot.activity_detail.minimum_count
+
+          @a_matrix[row_index] = Array.new(@matrix_information.n, 1)
+          @a_matrix_rows[row_index] = IlpMatrixRow.new("paritipant_count[GEQ(#{minimum_participant_count})]", Rglpk::GLP_LO , minimum_participant_count, 0)
+
+          row_index += 1
+        end
+
+        if @slot.activity_detail.maximum_count.present?
+          maximum_participant_count = @slot.activity_detail.maximum_count
+
+          @a_matrix[row_index] = Array.new(@matrix_information.n, 1)
+          @a_matrix_rows[row_index] = IlpMatrixRow.new("paritipant_count[LEQ(#{maximum_participant_count})]", Rglpk::GLP_UP , 0, maximum_participant_count)
+        end
       end
 
     end
