@@ -1,8 +1,9 @@
 module IlpPlanner
-  class Planner
+  class SlotPlanner
 
-    def initialize
-      @event = nil
+    def initialize(slot)
+      @slot = slot
+      @event = @slot.event
       @participant_wish_ratings = []
       @matrix_information = nil
 
@@ -16,24 +17,14 @@ module IlpPlanner
       @criterial_function_coefficients = []
     end
 
-    def self.plan (event_id)
-      event = Event.find(event_id)
-      results = []
+    def self.plan_slot(slot)
+      planner = IlpPlanner::SlotPlanner.new(slot)
 
-      event.slots.each_with_index do |slot, index|
-        slot_planner = IlpPlanner::Planner.new
-
-        # TODO store results and get the best one
-        # TODO reduce calculation of all variants if any better could not be found
-
-        results << slot_planner.plan_slot(slot)
-      end
-
-      results
+      planner.plan
     end
 
-    def plan_slot(slot)
-      setup_new_calculation_for(slot)
+    def plan
+      setup_new_calculation
       build_ilp_structures
       create_rglpk_problem
 
@@ -69,10 +60,7 @@ module IlpPlanner
       results
     end
 
-    def setup_new_calculation_for(slot)
-      @event = slot.event
-      @slot = slot
-
+    def setup_new_calculation
       @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@slot)
 
       # init structures - A, b

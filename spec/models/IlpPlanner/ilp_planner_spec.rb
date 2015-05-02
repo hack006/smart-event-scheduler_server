@@ -12,7 +12,8 @@ module IlpPlanner
     it 'should correctly create ILP problem' do
       event = Event.first
 
-      results = IlpPlanner::Planner.plan(event.id).to_s
+      event_planner_operator = IlpPlanner::PlannerOperator.new(event.id)
+      results =  event_planner_operator.find_best_slot.to_s
 
       puts results
 
