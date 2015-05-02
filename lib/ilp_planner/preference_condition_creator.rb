@@ -1,9 +1,11 @@
 module IlpPlanner
   class PreferenceConditionCreator
 
-    def initialize(event)
-      @event = event
-      @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(event)
+    # @param [Slot] slot
+    def initialize(slot)
+      @event = slot.event
+      @slot = slot
+      @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@slot)
     end
 
     # Creates n-ary AND condition
@@ -96,7 +98,7 @@ module IlpPlanner
 
     # Creates (!x(1) && !x(2) && .. && !x(n) ) => y condition
     #
-    # Modeled by: x(1) + x(2) + .. + x(n) - y >= 0
+    # Modeled by: x(1) + x(2) + .. + x(n) + y >= 1
     #   x(i), y := binary values
     #
     # @param [Array<Integer>] not_and_participant_ids
@@ -105,7 +107,7 @@ module IlpPlanner
     def create_multiple_not_and_implicate_condition(not_and_participant_ids, implicated_participant_id)
 
       condition_array = create_empty_condition_array
-      right_side_value = 0
+      right_side_value = 1
 
       not_and_participant_ids.each do |participant_id|
         participant_event_index = IlpPlanner::PlannerService.get_event_participant_id(@event.id, participant_id)
@@ -113,7 +115,7 @@ module IlpPlanner
       end
 
       implicated_participant_event_index = IlpPlanner::PlannerService.get_event_participant_id(@event.id, implicated_participant_id)
-      condition_array[implicated_participant_event_index] = -1
+      condition_array[implicated_participant_event_index] = 1
 
       IlpConditionRow.new(condition_array, IlpPlanner::EqualityTypes::GREATER_OR_EQUAL_THAN, right_side_value)
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150501183211) do
+ActiveRecord::Schema.define(version: 20150502085308) do
 
   create_table "activity_details", force: true do |t|
     t.integer  "event_id"
@@ -21,6 +21,8 @@ ActiveRecord::Schema.define(version: 20150501183211) do
     t.string   "price_per_unit"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "minimum_count"
+    t.integer  "maximum_count"
   end
 
   add_index "activity_details", ["event_id"], name: "index_activity_details_on_event_id", using: :btree

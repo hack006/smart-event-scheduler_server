@@ -71,7 +71,7 @@ module IlpPlanner
       @event = slot.event
       @slot = slot
 
-      @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@event)
+      @matrix_information = IlpPlanner::PlannerService.calc_matrix_information_for_event(@slot)
 
       # init structures - A, b
       (0..@matrix_information.m-1).each { |row_index| @a_matrix[row_index] = Array.new(@matrix_information.n, 0) }
@@ -85,6 +85,7 @@ module IlpPlanner
       @participant_wish_ratings = IlpPlanner::PlannerService.calc_participant_wish_ratings(@event)
 
       participant_ids = IlpPlanner::PlannerService.get_participant_ids(@event.id)
+      unavailable_participant_ids = []
 
       # criterial function coefficients
 
@@ -100,10 +101,14 @@ module IlpPlanner
       participant_ids.each_with_index do |participant_id, index|
         if slot_availability_by_participant_id[participant_id] == AvailabilityStatuses::AVAILABLE
           @criterial_function_coefficients[index] = @participant_wish_ratings[participant_id]
+        else
+          unavailable_participant_ids << participant_id
         end
       end
 
-      preference_condition_creator = IlpPlanner::PreferenceConditionCreator.new(@event)
+      # participant preference conditions
+
+      preference_condition_creator = IlpPlanner::PreferenceConditionCreator.new(@slot)
 
       PreferenceCondition.where('participant_id IN (?)', participant_ids).each_with_index do |condition, index|
 
@@ -156,6 +161,23 @@ module IlpPlanner
         end
 
       end
+
+      # Unavailable participant conditions
+
+      @matrix_information.unavailability_conditions_range.each_index do |position, position_index|
+        participant_id = unavailable_participant_ids[position_index]
+        event_participant_id = IlpPlanner::PlannerService.get_event_participant_id(@event.id, participant_id)
+
+        @a_matrix[position][event_participant_id] = 1
+        @a_matrix_rows[position] = IlpMatrixRow.new("condition_participant_unavailable[\##{event_participant_id}]", Rglpk::GLP_FX , 0, 0)
+      end
+
+      # Unavailable participant conditions
+      @matrix_information.required_count_conditions_range.each_index do |position, position_index|
+        raise 'Not implemented error'
+        # TODO
+      end
+
     end
 
     def create_rglpk_problem

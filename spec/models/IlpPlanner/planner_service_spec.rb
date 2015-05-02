@@ -18,7 +18,7 @@ module IlpPlanner
       expect(event.id).to eq 1
       expect(slot_1.id).to eq 1
 
-      matrix = IlpPlanner::PlannerService.calc_matrix_information_for_event(event)
+      matrix = IlpPlanner::PlannerService.calc_matrix_information_for_event(slot_1)
 
       expect(matrix.m).to equal(3) # 3 conditions
       expect(matrix.n).to equal(4) # 4 participants

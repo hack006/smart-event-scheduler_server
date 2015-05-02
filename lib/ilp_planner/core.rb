@@ -5,6 +5,7 @@ require_relative 'preference_condition_creator'
 require_relative 'd2matrix_information'
 require_relative 'planner_service'
 require_relative 'equality_types'
+require_relative 'index_range'
 
 module IlpPlanner
 

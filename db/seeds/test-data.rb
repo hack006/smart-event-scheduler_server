@@ -54,7 +54,7 @@ sarah_participant = Participant.create!({user: sarah, event: event})
 #                              (should win)
 
 [
-    {user: john_participant, availabilities:  ['n', 'y', 'y', 'n']},
+    {user: john_participant, availabilities:  ['n', 'y', 'n', 'n']},
     {user: jamie_participant, availabilities: ['n', 'n', 'y', 'n']},
     {user: peter_participant, availabilities: ['n', 'y', 'y', 'n']},
     {user: sarah_participant, availabilities: ['n', 'y', 'y', 'y']}
