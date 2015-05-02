@@ -1,9 +1,16 @@
 class PreferenceCondition < ActiveRecord::Base
 
   belongs_to :owner_participant, foreign_key: :participant_id
-  belongs_to :participant1, class: User, foreign_key: :participant1_id
-  belongs_to :participant2, class: User, foreign_key: :participant2_id
+
+  has_and_belongs_to_many :participants1,
+                          :join_table => 'preference_condition_participant1s',
+                          :class_name => 'Participant'
+
+  has_and_belongs_to_many :participants2,
+                          :join_table => 'preference_condition_participant2s',
+                          :class_name => 'Participant'
+
 
   validates :condition_type, inclusion: {in: PreferenceTypes.to_string_a},
-      presence: true
+            presence: true
 end

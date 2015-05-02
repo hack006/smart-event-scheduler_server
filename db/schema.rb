@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150425153756) do
+ActiveRecord::Schema.define(version: 20150501183211) do
 
   create_table "activity_details", force: true do |t|
     t.integer  "event_id"
@@ -61,17 +61,33 @@ ActiveRecord::Schema.define(version: 20150425153756) do
   add_index "participants", ["event_id"], name: "index_participants_on_event_id", using: :btree
   add_index "participants", ["user_id"], name: "index_participants_on_user_id", using: :btree
 
-  create_table "preference_conditions", force: true do |t|
-    t.string   "condition_type"
+  create_table "preference_condition_participant1s", force: true do |t|
+    t.integer  "preference_condition_id"
     t.integer  "participant_id"
-    t.integer  "participant1_id"
-    t.integer  "participant2_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "preference_conditions", ["participant1_id"], name: "index_preference_conditions_on_participant1_id", using: :btree
-  add_index "preference_conditions", ["participant2_id"], name: "index_preference_conditions_on_participant2_id", using: :btree
+  add_index "preference_condition_participant1s", ["participant_id"], name: "index_preference_condition_participant1s_on_participant_id", using: :btree
+  add_index "preference_condition_participant1s", ["preference_condition_id"], name: "preference_condition_participants1_condition_id_index", using: :btree
+
+  create_table "preference_condition_participant2s", force: true do |t|
+    t.integer  "preference_condition_id"
+    t.integer  "participant_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "preference_condition_participant2s", ["participant_id"], name: "index_preference_condition_participant2s_on_participant_id", using: :btree
+  add_index "preference_condition_participant2s", ["preference_condition_id"], name: "preference_condition_participants2_condition_id_index", using: :btree
+
+  create_table "preference_conditions", force: true do |t|
+    t.string   "condition_type"
+    t.integer  "participant_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   add_index "preference_conditions", ["participant_id"], name: "index_preference_conditions_on_participant_id", using: :btree
 
   create_table "preference_prioritizations", force: true do |t|

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-load File.join(Rails.root, 'lib', 'ilp_planner', 'planner.rb')
+load File.join(Rails.root, 'lib', 'ilp_planner.rb')
 
 module IlpPlanner
   RSpec.describe PlannerService, type: :model do
@@ -13,6 +13,8 @@ module IlpPlanner
       event = Event.first
 
       results = IlpPlanner::Planner.plan(event.id).to_s
+
+      puts results
 
       expect(results).to be_a_kind_of String
       expect(results.length).to be > 0

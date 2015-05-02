@@ -71,15 +71,14 @@ end
 
 # Conditions
 
-# Sarah -> Peter
+# (Sarah || John) => Peter
 # !Jamie -> Peter
 # John && Sarah (organizers)
-PreferenceCondition.create!({participant_id: peter_participant.id, condition_type: PreferenceTypes::IMPLICATE, participant1_id: sarah_participant.id, participant2_id: peter_participant.id})
-PreferenceCondition.create!({participant_id: peter_participant.id, condition_type: PreferenceTypes::NOT_IMPLICATE, participant1_id: jamie_participant.id, participant2_id: peter_participant.id})
-PreferenceCondition.create!({participant_id: john_participant.id, condition_type: PreferenceTypes::AND, participant1_id: john_participant.id, participant2_id: sarah_participant.id})
+PreferenceCondition.create!({participant_id: peter_participant.id, condition_type: PreferenceTypes::OR_IMPLICATE, participants1: [sarah_participant, john_participant], participants2: [peter_participant]})
+PreferenceCondition.create!({participant_id: peter_participant.id, condition_type: PreferenceTypes::NOT_AND_IMPLICATE, participants1: [jamie_participant], participants2: [peter_participant]})
+PreferenceCondition.create!({participant_id: john_participant.id, condition_type: PreferenceTypes::AND, participants1: [john_participant], participants2: [sarah_participant]})
 
-
-# WS - want to see, NS - nice to see, DC - dont care, NWS - want not to see
+# (row to column) | WS - want to see, NS - nice to see, DC - dont care, NWS - want not to see
 #
 #         | John    | Jamie   | Peter   | Sarah   |
 # -------------------------------------------------
