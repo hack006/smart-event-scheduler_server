@@ -24,12 +24,13 @@ module IlpPlanner
     end
 
     def plan
+      @calculation_start_time = Time.now
       setup_new_calculation
       build_ilp_structures
       create_rglpk_problem
 
       # TODO remove in production
-      write_debug_files
+      # write_debug_files
 
       solve_plan_slot_get_result
     end
@@ -47,17 +48,18 @@ module IlpPlanner
 
     # @return [IlpPlanner::EventPlanningResult]
     def solve_plan_slot_get_result
-      puts 'Running simplex calculation ...'
-      @glpk.simplex
-      puts 'Calculation ended'
+      @glpk.mip("presolve" => Rglpk::GLP_ON)
 
-      z = @glpk.obj.get
+      z = @glpk.obj.mip
 
       variable_values = @glpk_cols.map do |col|
-        col.get_prim
+        col.mip_val
       end
 
-      IlpPlanner::EventPlanningResult.new(@slot, z, variable_values)
+      @calculation_end_time = Time.now
+      calculation_time_ms = ((@calculation_end_time - @calculation_start_time) * 1000).to_i
+
+      IlpPlanner::SlotPlanningResult.new(@slot, z, variable_values, calculation_time_ms)
     end
 
     def setup_new_calculation
@@ -216,10 +218,9 @@ module IlpPlanner
       end
 
       # c(j) values
-      # todo
       @glpk.obj.coefs = @criterial_function_coefficients
 
-      puts "Criterial coefficients: #{@criterial_function_coefficients}"
+      #puts "Criterial coefficients: #{@criterial_function_coefficients}"
 
       # A(i,j)
       @glpk.set_matrix(@a_matrix.flatten)

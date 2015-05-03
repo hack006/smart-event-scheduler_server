@@ -17,6 +17,8 @@ module IlpPlanner
 
       puts "Criterial value: #{result.criterial_value}\n"
       puts "Variable values: #{result.variable_values}\n"
+      puts "Total time: #{result.event_calculation_time_ms}\n"
+
 
       expect(result.criterial_value).to be_a_kind_of Numeric
       expect(result.criterial_value).to eq 33
