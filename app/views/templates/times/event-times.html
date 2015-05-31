@@ -1,0 +1,55 @@
+<div ng-form="timesForm">
+    <fieldset class="bordered-fieldset">
+        <legend>Default values</legend>
+
+        <div class="form-group">
+            <label class="col-md-3">Time slot length in minutes</label>
+
+            <div class="col-md-2 form-label">
+                <input type="number" class="form-control"
+                       ng-model="defaultTimeSlotInMinutes" display-validations required form="timesForm" name="defaultTimeSlotInMinutes">
+            </div>
+        </div>
+    </fieldset>
+
+    <div ng-repeat="time in times" class="list-item">
+        <div ng-form="timeForm" ng-controller="EventTimeController">
+            <div class="form-group vertical-align">
+                <label class="form-label col-md-1">From</label>
+
+                <div class="col-md-4">
+                    <datetimepicker ng-model="time.from" date-format="dd-MMM-yyyy" readonly-time="false"
+                                    form="timeForm" name="from"></datetimepicker>
+                </div>
+
+                <label class="form-label col-md-1">Until</label>
+
+                <div class="col-md-4">
+                    <datetimepicker ng-model="time.until" date-format="dd-MMM-yyyy" readonly-time="false"
+                                    form="timeForm" name="until"></datetimepicker>
+                </div>
+
+                <label class="col-md-1">Duration</label>
+
+                <div class="col-md-1">
+                    {{ dateDifferenceInMinutes(time.until, time.from) }}&nbsp;min
+                </div>
+
+                <div class="col-md-1">
+                    <div class="btn btn-danger" role="button" ng-click="removeTime(time)">
+                        <i class="fa fa-times"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <a class="btn btn-success btn-block" ng-click="addTime()">
+                <i class="fa fa-plus"></i>
+                Add time
+            </a>
+        </div>
+    </div>
+</div>

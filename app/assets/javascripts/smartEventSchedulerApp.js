@@ -11,7 +11,9 @@ app = angular.module('smartEventSchedulerApp',
         // application modules
         'smartEventScheduler.common',
         'smartEventScheduler.dashboard',
-        'smartEventScheduler.events'
+        'smartEventScheduler.events',
+        'smartEventScheduler.events.activities',
+        'smartEventScheduler.events.times'
     ]);
 
 app.config(function ($stateProvider, $urlRouterProvider, flashProvider) {

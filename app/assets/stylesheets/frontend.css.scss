@@ -6,3 +6,28 @@
   display: flex;
   align-items: center;
 }
+
+ul.nav-tabs > li > a {
+  &:hover {
+    color: #000000;
+  }
+}
+
+.slots-activity-column {
+  width: 135px;
+}
+.slots-time-column {
+  min-width: 180px;
+}
+
+fieldset.bordered-fieldset {
+  border: dotted 1px darkgrey;
+  margin-bottom: 20px;
+
+  legend {
+    width: auto;
+    padding: 7px;
+    margin: 0 15px;
+    border: none;
+  }
+}

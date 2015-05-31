@@ -1,0 +1,73 @@
+<fieldset class="bordered-fieldset">
+    <legend>Default values</legend>
+
+    <div class="form-group">
+        <label class="form-label col-md-1">Price:</label>
+        <div class="col-md-2">
+            <input type="number" class="form-control"
+                   ng-model="defaultPrice">
+        </div>
+
+        <label class="form-label col-md-1">Currency:</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control"
+                   ng-model="defaultCurrency">
+        </div>
+
+        <label class="form-label col-md-3">Activity duration unit:</label>
+        <div class="col-md-2">
+            <input type="text" class="form-control"
+                   ng-model="defaultActivityDurationUnit">
+        </div>
+    </div>
+</fieldset>
+
+
+<div ng-repeat="activity in activities" ng-form="activityForm">
+    <div class="form-group">
+        <label class="form-label col-md-1">Name</label>
+
+        <div class="col-md-3">
+            <input type="text" class="form-control"
+                   ng-model="activity.name"
+                   name="name" form="activityForm" display-validations required>
+        </div>
+
+        <label class="form-label col-md-1">Price</label>
+
+        <div class="col-md-2">
+            <input type="number" min="0" class="form-control"
+                   ng-model="activity.price"
+                   name="price" form="activityForm" display-validations required>
+        </div>
+
+        <div class="col-md-1">
+            <input type="text" class="form-control"
+                    ng-model="activity.priceUnit"
+                    name="priceUnit" form="activityForm" display-validations required>
+        </div>
+
+        <label class="form-label col-md-1">Per</label>
+
+        <div class="col-md-2">
+            <input type="text" class="form-control"
+                   ng-model="activity.pricePerUnit"
+                   name="pricePerUnit" form="activityForm">
+        </div>
+
+        <div class="col-md-1">
+            <a class="btn btn-danger" ng-click="removeActivity(activity)">
+                <i class="fa fa-times"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        <a class="btn btn-success btn-block" ng-click="addActivity()">
+            <i class="fa fa-plus"></i>
+            Add activity
+        </a>
+    </div>
+</div>

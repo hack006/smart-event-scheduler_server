@@ -79,53 +79,18 @@ app.controller('EventController', function ($scope, $state, $stateParams, eventR
             votingDeadline: getCurrentDate().cloneAddSeconds(DAY_IN_SECONDS * 7),
             times: [],
             activities: [],
-            slots: {} // {<time_detail_id>: [<activity_ids>]}
+            slots: []
         };
     }
 
-    $scope.defaultTimeSlotInMinutes = 60;
-
-    $scope.addTime = function () {
-        $scope.event.times.push({
-            from: getCurrentDate(),
-            until: getCurrentDate()
+    $scope.existsItemWithoutId = function (collection) {
+        var has = false;
+        angular.forEach(collection, function (item) {
+            if (angular.isUndefined(item.id)) {
+                has = true;
+            }
         });
-    };
-
-    $scope.removeTime = function (time) {
-        var eventIndex = $scope.event.times.indexOf(time);
-        $scope.event.times.splice(eventIndex, 1);
-    };
-
-    $scope.addActivity = function () {
-        $scope.event.activities.push({});
-    };
-
-    $scope.removeActivity = function (activity) {
-        var eventIndex = $scope.event.activities.indexOf(activity);
-        $scope.event.activities.splice(eventIndex, 1);
-    };
-
-    $scope.toggleSlot = function (time, activity) {
-        var slots = $scope.event.slots;
-        if (angular.isUndefined(slots[time.id])) {
-            slots[time.id] = [];
-        }
-        var indexOfActivity = slots[time.id].indexOf(activity.id);
-        if (indexOfActivity == -1) {
-            slots[time.id].push(activity.id);
-        } else {
-            slots.splice(indexOfActivity, 1);
-        }
-    };
-
-    $scope.isSelected = function (time, activity) {
-        var slots = $scope.event.slots;
-        if (angular.isUndefined(slots[time.id])) {
-            return false;
-        } else {
-            return slots[time.id].contains(activity.id);
-        }
+        return has;
     };
 
     $scope.save = function () {
@@ -136,26 +101,113 @@ app.controller('EventController', function ($scope, $state, $stateParams, eventR
     };
 });
 
-app.controller('EventTimeController', function ($scope) {
-    // fill until with the from + default slot length value
+app.directive('eventActivityTimeSlot', function ($modal) {
+    return {
+        restrict: 'E',
+        scope: {
+            time: '=',
+            activity: '=',
+            selectedSlots: '='
+        },
+        templateUrl: 'templates/events/activity-time-slot.html',
+        link: function (scope) {
+            var notBlankString = function (text) {
+                return angular.isDefined(text) && typeof text == 'string' && text.length > 0
+            };
 
-    var dateToMinutes = function (date) {
-        return date.getTime() / 60000;
-    };
+            var findTimeEntry = function (slots, timeId) {
+                for (var i = 0; i < slots.length; i++) {
+                    var slot = slots[i];
+                    if (slot.timeDetailId == timeId) {
+                        return slot;
+                    }
+                }
 
-    $scope.$watch('time.from.getTime()', function () {
-        if (angular.isDefined($scope.time.from) && $scope.timeForm.until.$pristine) {
-            $scope.time.until = $scope.time.from.cloneAddSeconds(60 * $scope.defaultTimeSlotInMinutes);
+                return undefined;
+            };
+
+            var findActivityEntry = function (timeSlots, activityId) {
+                for (var i = 0; i < timeSlots.length; i++) {
+                    var slot = timeSlots[i];
+                    if (slot.activityDetailId == activityId) {
+                        return slot;
+                    }
+                }
+
+                return undefined;
+            };
+
+            var findSlot = function (time, activity) {
+                var slotWithTime = findTimeEntry(scope.selectedSlots, time.id);
+
+                if (angular.isUndefined(slotWithTime)) {
+                    return undefined;
+                }
+
+                return findActivityEntry(slotWithTime.activities, activity.id);
+            };
+
+            scope.slotToggleable = function () {
+                return angular.isDefined(scope.time.id) && angular.isDefined(scope.activity.id)
+            };
+
+            scope.toggleSlot = function (time, activity) {
+                if (angular.isUndefined(time.id) || angular.isUndefined(activity.id)) {
+                    throw 'Error! Time or activity entity for this slot has not been persisted, yet!'
+                }
+
+                var slotWithTime = findTimeEntry(scope.selectedSlots, time.id);
+
+                if (angular.isUndefined(slotWithTime)) {
+                    scope.selectedSlots.push({
+                        timeDetailId: time.id,
+                        activities: []
+                    });
+                }
+
+                var slotWithActivity = findActivityEntry(slotWithTime.activities, activity.id);
+
+                if (angular.isDefined(slotWithActivity)) {
+                    var slotIndex = slotWithTime.activities.indexOf(slotWithActivity)
+                    slotWithTime.activities.splice(slotIndex, 1);
+                } else {
+                    slotWithTime.activities.push({
+                        activityDetailId: activity.id,
+                        note: ''
+                    });
+                }
+            };
+
+            scope.isSelected = function (time, activity) {
+                return angular.isDefined(findSlot(time, activity));
+            };
+
+            scope.noteExists = function () {
+                return scope.isSelected(scope.time, scope.activity) && notBlankString(scope.getSlot().note)
+            };
+
+            scope.getSlot = function () {
+                return findSlot(scope.time, scope.activity);
+            };
+
+            scope.displaySlotModal = function () {
+                $modal.open({
+                    resolve: {
+                        slot: function () {
+                            return scope.getSlot();
+                        }
+                    },
+                    templateUrl: 'templates/events/slot-modal.html',
+                    controller: 'EventSlotModalController',
+                    windowClass: 'modal-with-overlay'
+                });
+            };
         }
-    });
+    }
+});
 
-    $scope.dateDifferenceInMinutes = function (date1, date2) {
-        if (angular.isUndefined(date1) || angular.isUndefined(date2)) {
-            return 0
-        } else {
-            return dateToMinutes(new Date(date1.getTime() - date2.getTime()))
-        }
-    };
+app.controller('EventSlotModalController', function ($scope, $modalInstance, slot) {
+    $scope.slot = slot;
 });
 
 app.factory('eventResourceService', function (apiVersion, restService) {

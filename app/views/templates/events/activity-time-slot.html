@@ -1,0 +1,18 @@
+<a class="btn btn-default" ng-if="slotToggleable()" ng-click="toggleSlot(time, activity)" ng-class="{'btn-success':isSelected(time, activity)}">
+    <i class="fa fa-check-square-o" ng-if="isSelected(time, activity)"></i>
+    <i class="fa fa-square-o" ng-if="!isSelected(time, activity)"></i>
+</a>
+
+<a class="btn btn-default disabled" ng-if="!slotToggleable()" title="Has to be saved before activating.">
+    <i class="fa fa-square-o"></i>
+</a>
+
+<div class="btn-group" ng-if="isSelected(time, activity)">
+    <a class="btn btn-default" ng-if="noteExists()" tooltip-placement="top" tooltip="{{getSlot().note}}">
+        <i class="fa fa-info"></i>
+    </a>
+
+    <a class="btn btn-default hover-visible" ng-click="displaySlotModal()">
+        <i class="fa fa-pencil"></i>
+    </a>
+</div>

@@ -14,7 +14,7 @@ app.factory('authenticationService', function () {
 app.directive('displayValidations', function ($compile) {
     return {
         restrict: 'A',
-        scope: true,
+        scope: false,
         link: function (scope, element, attrs) {
             var validationHTML =
                 '<span class="validation-error" ng-if="' + attrs.form + '.' + attrs.name + '.$error.min">Value must be equal or greater than ' + attrs.min + '.</span>' +
@@ -89,4 +89,11 @@ app.filter('remainingTime', function () { // TODO rewrite to better orientation 
             return 'about ' + timeFromNow.getHours() + ' ' + hourSingularPlural(timeFromNow) + ' ' + timeFromNow.getMinutes() + ' ' + minuteSingularPlural(timeFromNow);
         }
     }
+});
+
+app.value('defaultValues', {
+    price: 0,
+    currency: 'Kč',
+    activityDurationUnit: 'hod',
+    defaultTimeSlotInMinutes: 60
 });

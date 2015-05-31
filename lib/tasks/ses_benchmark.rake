@@ -7,6 +7,8 @@ namespace :ses do
     repetitions = 5
 
     benchmark_setups = [
+        {participant_count: 2, times_count: 6},
+        {participant_count: 3, times_count: 6},
         {participant_count: 4, times_count: 6},
         {participant_count: 8, times_count: 6},
         {participant_count: 12, times_count: 6},
@@ -15,8 +17,14 @@ namespace :ses do
         {participant_count: 20, times_count: 6},
         {participant_count: 22, times_count: 6},
         {participant_count: 24, times_count: 6},
-        {participant_count: 25, times_count: 6}
+        {participant_count: 25, times_count: 6},
+        {participant_count: 26, times_count: 6},
+        {participant_count: 27, times_count: 6},
+        {participant_count: 28, times_count: 6},
+        {participant_count: 29, times_count: 6},
+        {participant_count: 30, times_count: 6}
     ]
+
     benchmark_results = Array.new(benchmark_setups.length)
 
     benchmark_setups.each_with_index do |b, b_index|
